@@ -8,5 +8,3 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         print(args, options)
-        # keep you logic here to run in command
-        pass

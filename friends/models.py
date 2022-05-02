@@ -35,16 +35,13 @@ class FriendshipManager(FriendshipBaseManager):
         """
         friends1 = cache.get(cache_key("friends", user1.pk))
         friends2 = cache.get(cache_key("friends", user2.pk))
-        if friends1 and user2 in friends1:
+        if friends1 and user2 in friends1 or friends2 and user1 in friends2:
             return True
-        elif friends2 and user1 in friends2:
+        try:
+            Friend.objects.get(to_user=user1, from_user=user2, is_active=True)
             return True
-        else:
-            try:
-                Friend.objects.get(to_user=user1, from_user=user2, is_active=True)
-                return True
-            except Friend.DoesNotExist:
-                return False
+        except Friend.DoesNotExist:
+            return False
 
     def remove_friend(self, from_user, to_user):
         """
@@ -52,9 +49,7 @@ class FriendshipManager(FriendshipBaseManager):
         """
         try:
             qs = Friend.objects.filter(Q(to_user=to_user, from_user=from_user) | Q(to_user=from_user, from_user=to_user))
-            distinct_qs = qs.distinct().all()
-
-            if distinct_qs:
+            if distinct_qs := qs.distinct().all():
                 friendship_removed.send(
                     sender=distinct_qs[0], from_user=from_user, to_user=to_user
                 )

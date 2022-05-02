@@ -56,19 +56,17 @@ class PostSerializer(FlexFieldsModelSerializer):
         request = self.context['request']
         r_data = self.context['request'].FILES
 
-        
+
         if "comments" in validated_data.keys():
             comments = validated_data.pop('comments')
         else:
             comments = list()
-            
+
         post = Post.objects.create(author=request.user.profile, **validated_data)
         for comment in comments:
             Comment.objects.create(**comment, post=post)
-        
+
         if 'image' in r_data:
             post_image = PostImage.objects.create(image=r_data['image'])
             post.image.add(post_image)
-        else:
-            pass
         return post

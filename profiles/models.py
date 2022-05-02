@@ -76,7 +76,7 @@ def upload_avatar(instance, filename):
     This is function handles the user uploaded avatars.'''
     path = 'avatars'
     ext = filename.split('.')[-1]
-    filename = '{}.{}'.format(instance.user.username, ext)
+    filename = f'{instance.user.username}.{ext}'
     return os.path.join(path, filename)
 
 
@@ -158,11 +158,8 @@ class Profile(models.Model):
             if self.first_name and self.last_name:
                 to_slug = slugify(str(self.first_name) +
                                   '_' + str(self.last_name))
-                ex = Profile.objects.filter(slug=to_slug).exists()
-                while ex:
-                    to_slug = slugify(
-                        to_slug + '-' + str(profiles.get_random_code()))
-                    ex = Profile.objects.filter(slug=to_slug).exists()
+                while ex := Profile.objects.filter(slug=to_slug).exists():
+                    to_slug = slugify(f'{to_slug}-{str(profiles.get_random_code())}')
             else:
                 to_slug = str(self.user)
         self.slug = to_slug

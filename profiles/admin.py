@@ -66,7 +66,4 @@ class ProfileAdmin(admin.ModelAdmin):
         return list(self.readonly_fields) + ["slug", "first_name"]
     
     def get_prepopulated_fields(self, request, obj=None):
-        if request.user.is_superuser:
-            return self.prepopulated_fields
-        else:
-            return {}
+        return self.prepopulated_fields if request.user.is_superuser else {}
